@@ -1,0 +1,28 @@
+{
+  "name": "nest-openapi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenAPI tools for NestJS applications",
+  "packageManager": "pnpm@8.11.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r run build",
+    "clean": "rimraf dist",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --port 5173"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "ajv-formats": "^3.0.1",
+    "vitepress": "^1.3.4",
+    "vue": "^3.4.0",
+    "rimraf": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.4.0"
+  }
+}

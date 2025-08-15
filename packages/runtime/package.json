@@ -1,0 +1,31 @@
+{
+  "name": "@nest-openapi/runtime",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --target node20 --outDir dist --clean --external @nestjs/common",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "clean": "rimraf dist"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^9.0.0 || ^10.0.0 || ^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  }
+}
