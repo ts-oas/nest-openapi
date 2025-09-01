@@ -8,15 +8,15 @@ See [options](/validator/options) for full available configuration.
 // app.module.ts
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { OpenApiValidatorModule } from "@nest-openapi/validator";
+import { OpenAPIValidatorModule } from "@nest-openapi/validator";
 import addFormats from "ajv-formats";
 
 @Module({
   imports: [
-    OpenApiValidatorModule.forRootAsync({
+    OpenAPIValidatorModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        specSource: { type: "object", spec: config.getOpenApiSpec() },
+        specSource: { type: "object", spec: config.getOpenAPISpec() },
         options: {
           ajv: {
             options: {
@@ -80,7 +80,7 @@ Inside your handler, you can whether:
 - Log and ignore errors (return without throwing).
 
 ```typescript
-OpenApiValidatorModule.forRoot({
+OpenAPIValidatorModule.forRoot({
   specSource: { type: "object", spec: openApiSpec },
   requestValidation: {
     enable: true,

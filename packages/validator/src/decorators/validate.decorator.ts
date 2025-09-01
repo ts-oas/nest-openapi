@@ -1,8 +1,8 @@
 import { SetMetadata } from '@nestjs/common';
 
-export const VALIDATE_KEY = 'VALIDATE';
+export const VALIDATE_OVERRIDE = Symbol("VALIDATE_OVERRIDE");
 
-export interface ValidateOptions {
+export interface ValidateOverrideOptions {
   request?: boolean | {
     params?: boolean;
     query?: boolean;
@@ -39,5 +39,5 @@ export interface ValidateOptions {
  * }
  * ```
  */
-export const Validate = (options: ValidateOptions = {}) =>
-  SetMetadata(VALIDATE_KEY, options);
+export const Validate = (options: ValidateOverrideOptions = {}) =>
+  SetMetadata(VALIDATE_OVERRIDE, options);

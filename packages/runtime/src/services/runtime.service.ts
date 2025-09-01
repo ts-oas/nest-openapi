@@ -1,13 +1,16 @@
-import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { DebugUtil } from "../utils/debug.util";
 import { OpenAPISpec, SpecSource } from "../types";
 import { SchemaResolverService } from "./schema-resolver.service";
+import { createHash } from "crypto";
 export const OPENAPI_RUNTIME_OPTIONS = Symbol('OPENAPI_RUNTIME_OPTIONS');
 
 @Injectable()
-export class OpenApiRuntimeService implements OnModuleInit {
-  spec!: OpenAPISpec;
-  private readonly logger = new Logger('OpenApiValidator');
+export class OpenAPIRuntimeService {
+  /** A map of spec hashes to spec objects.  */
+  public spec: OpenAPISpec;
+  public specHash: string;
+  private readonly logger = new Logger('OpenAPIRuntime');
   private debugLog: (message: string, ...args: any[]) => void;
   public schemaResolver: SchemaResolverService;
 
@@ -18,9 +21,11 @@ export class OpenApiRuntimeService implements OnModuleInit {
     this.debugLog = DebugUtil.createDebugFn(this.logger, this.options.debug || false);
   }
 
-  async onModuleInit(): Promise<void> {
+  async onModuleInit(): Promise<typeof this> {
     await this.load();
     this.schemaResolver = new SchemaResolverService(this.spec);
+
+    return this;
   }
 
   private async load(): Promise<void> {
@@ -51,5 +56,11 @@ export class OpenApiRuntimeService implements OnModuleInit {
       }
     }
 
+    this.specHash = this.generateSpecHash(this.spec);
+  }
+
+  private generateSpecHash(spec: OpenAPISpec): string {
+    const s = JSON.stringify(spec);
+    return "spec:" + createHash("sha1").update(s).digest("hex");
   }
 }

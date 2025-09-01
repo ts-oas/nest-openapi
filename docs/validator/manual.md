@@ -2,21 +2,21 @@
 
 ## Validate using methods
 
-Inject the `OpenApiValidatorService` using the `OPENAPI_VALIDATOR` token for custom validation logic in guards, filters, services, or middleware:
+Inject the `OpenAPIValidatorService` using the `OPENAPI_VALIDATOR` token for custom validation logic in guards, filters, services, or middleware:
 
 ```typescript
 import { Injectable, Inject } from "@nestjs/common";
 import { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import {
   OPENAPI_VALIDATOR,
-  OpenApiValidatorService,
+  OpenAPIValidatorService,
 } from "@nest-openapi/validator";
 
 @Injectable()
 export class MyService {
   constructor(
     @Inject(OPENAPI_VALIDATOR)
-    private readonly validator: OpenApiValidatorService
+    private readonly validator: OpenAPIValidatorService
   ) {}
 
   validateData(httpContext: HttpArgumentsHost, responseBody) {
@@ -53,7 +53,7 @@ import {
 } from "@nestjs/common";
 import {
   OPENAPI_VALIDATOR,
-  OpenApiValidatorService,
+  OpenAPIValidatorService,
 } from "@nest-openapi/validator";
 
 @Catch()
@@ -61,7 +61,7 @@ import {
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(
     @Inject(OPENAPI_VALIDATOR)
-    private readonly validator: OpenApiValidatorService
+    private readonly validator: OpenAPIValidatorService
   ) {}
 
   catch(exception: any, host: ArgumentsHost) {

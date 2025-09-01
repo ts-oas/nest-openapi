@@ -3,7 +3,7 @@ import { OpenAPISpec } from '../types';
 
 @Injectable()
 export class SchemaResolverService {
-  private readonly logger = new Logger('OpenApiValidator');
+  private readonly logger = new Logger('OpenAPIValidator');
 
   constructor(private readonly spec: OpenAPISpec) {}
 

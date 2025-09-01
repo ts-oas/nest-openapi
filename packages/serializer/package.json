@@ -1,17 +1,17 @@
 {
-  "name": "@nest-openapi/validator",
-  "version": "0.1.1",
-  "description": "Automatic request/response validation for NestJS using your OpenAPI specifications",
+  "name": "@nest-openapi/serializer",
+  "version": "0.1.0",
+  "description": "High‑performance response serialization based on your OpenAPI specifications",
   "sideEffects": false,
   "keywords": [
     "nest",
     "nestjs",
     "openapi",
     "swagger",
-    "validation",
-    "ajv",
+    "serializer",
+    "fast-json-stringify",
     "typescript",
-    "schema"
+    "jsonschema"
   ],
   "type": "module",
   "main": "./dist/index.cjs",
@@ -28,12 +28,10 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --target node20 --outDir dist --clean --external rxjs --external ajv --external @nestjs/common --external @nestjs/core",
+    "build": "tsup src/index.ts --format esm,cjs --dts --target node20 --outDir dist --clean --external rxjs --external @nestjs/common --external @nestjs/core --external fast-json-stringify",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "prepack": "node -e \"const fs=require('fs');const path=require('path');fs.copyFileSync(path.resolve(__dirname,'..','..','README.md'), path.resolve(__dirname,'README.md'));\"",
-    "postpack": "node -e \"const fs=require('fs');const path=require('path');try{fs.unlinkSync(path.resolve(__dirname,'README.md'))}catch(_){}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -53,17 +51,11 @@
   "peerDependencies": {
     "@nestjs/common": "^9.0.0 || ^10.0.0 || ^11.0.0",
     "@nestjs/core": "^9.0.0 || ^10.0.0 || ^11.0.0",
-    "ajv": "^8.0.0",
     "reflect-metadata": "^0.2.2"
-  },
-  "peerDependenciesMeta": {
-    "ajv": {
-      "optional": true
-    }
   },
   "dependencies": {
     "@nest-openapi/runtime": "^0.1.1",
-    "ajv": "^8.0.0",
+    "fast-json-stringify": "^6.0.1",
     "rxjs": "^7.2.0"
   },
   "devDependencies": {
@@ -74,9 +66,6 @@
     "@nestjs/testing": "^11.0.0",
     "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.35.1",
-    "@typescript-eslint/parser": "^8.35.1",
-    "eslint": "^9.30.1",
     "jest": "^29.0.0",
     "reflect-metadata": "^0.2.2",
     "supertest": "^7.1.0",

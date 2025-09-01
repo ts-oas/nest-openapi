@@ -2,18 +2,18 @@ import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 import { APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 
 import {
-  OpenApiValidatorService,
-  OPENAPI_VALIDATOR_OPTIONS,
+  OpenAPIValidatorService,
   OPENAPI_VALIDATOR,
 } from '../services/openapi-validator.service';
 import { RequestValidationInterceptor } from '../interceptors/request-validation.interceptor';
 import { ResponseValidationInterceptor } from '../interceptors/response-validation.interceptor';
 import { ValidatorOptions } from '../types';
-import { OpenApiRuntimeService, OPENAPI_RUNTIME_OPTIONS } from '@nest-openapi/runtime';
+import { OPENAPI_RUNTIME_OPTIONS, OpenAPIRuntimePool } from '@nest-openapi/runtime';
+import { OPENAPI_VALIDATOR_RUNTIME, OPENAPI_VALIDATOR_OPTIONS } from '../types/validator-options.interface';
 
 @Global()
 @Module({})
-export class OpenApiValidatorModule {
+export class OpenAPIValidatorModule {
   /**
    * Configure the OpenAPI validator module with static options
    */
@@ -41,16 +41,13 @@ export class OpenApiValidatorModule {
 
       // Core services
       {
-        provide: OpenApiRuntimeService,
-        useFactory: async (runtimeOptions: any) => {
-          const svc = new OpenApiRuntimeService(runtimeOptions);
-          await svc.onModuleInit();
-          return svc;
-        },
-        inject: [OPENAPI_RUNTIME_OPTIONS],
+        provide: OPENAPI_VALIDATOR_RUNTIME,
+        useFactory: async (opts: ValidatorOptions) =>
+          OpenAPIRuntimePool.getOrCreate({ specSource: opts.specSource, debug: opts.debug }),
+        inject: [OPENAPI_VALIDATOR_OPTIONS],
       },
-      OpenApiValidatorService,
-      { provide: OPENAPI_VALIDATOR, useExisting: OpenApiValidatorService },
+      OpenAPIValidatorService,
+      { provide: OPENAPI_VALIDATOR, useExisting: OpenAPIValidatorService },
 
       // Interceptors
       { provide: APP_INTERCEPTOR, useClass: RequestValidationInterceptor },
@@ -64,13 +61,11 @@ export class OpenApiValidatorModule {
     }
 
     return {
-      module: OpenApiValidatorModule,
+      module: OpenAPIValidatorModule,
       providers,
       exports: [
-        OPENAPI_VALIDATOR_OPTIONS,
         OPENAPI_VALIDATOR,
-        OpenApiRuntimeService,
-        OpenApiValidatorService,
+        OpenAPIValidatorService,
       ],
     };
   }
@@ -113,16 +108,13 @@ export class OpenApiValidatorModule {
 
       // Core services
       {
-        provide: OpenApiRuntimeService,
-        useFactory: async (runtimeOptions: any) => {
-          const svc = new OpenApiRuntimeService(runtimeOptions);
-          await svc.onModuleInit();
-          return svc;
-        },
-        inject: [OPENAPI_RUNTIME_OPTIONS],
+        provide: OPENAPI_VALIDATOR_RUNTIME,
+        useFactory: async (opts: ValidatorOptions) =>
+          OpenAPIRuntimePool.getOrCreate({ specSource: opts.specSource, debug: opts.debug }),
+        inject: [OPENAPI_VALIDATOR_OPTIONS],
       },
-      OpenApiValidatorService,
-      { provide: OPENAPI_VALIDATOR, useExisting: OpenApiValidatorService },
+      OpenAPIValidatorService,
+      { provide: OPENAPI_VALIDATOR, useExisting: OpenAPIValidatorService },
 
       // Interceptors
       { provide: APP_INTERCEPTOR, useClass: RequestValidationInterceptor },
@@ -132,7 +124,7 @@ export class OpenApiValidatorModule {
         provide: APP_INTERCEPTOR,
         useFactory: (
           validatorOptions: ValidatorOptions,
-          validatorService: OpenApiValidatorService,
+          validatorService: OpenAPIValidatorService,
           reflector: Reflector,
         ) => {
           if (validatorOptions.responseValidation?.enable) {
@@ -141,19 +133,17 @@ export class OpenApiValidatorModule {
           // no-op when disabled
           return { intercept: (_ctx: any, next: any) => next.handle() };
         },
-        inject: [OPENAPI_VALIDATOR_OPTIONS, OpenApiValidatorService, Reflector],
+        inject: [OPENAPI_VALIDATOR_OPTIONS, OpenAPIValidatorService, Reflector],
       } as any,
     ];
 
     return {
-      module: OpenApiValidatorModule,
+      module: OpenAPIValidatorModule,
       imports: options.imports || [],
       providers,
       exports: [
-        OPENAPI_VALIDATOR_OPTIONS,
         OPENAPI_VALIDATOR,
-        OpenApiRuntimeService,
-        OpenApiValidatorService,
+        OpenAPIValidatorService,
       ],
     };
   }

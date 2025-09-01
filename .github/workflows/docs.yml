@@ -1,55 +1,39 @@
-name: Deploy Docs
+name: Publish docs to org site
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
 
-      - name: Build docs
-        run: pnpm docs:build
+      # Force org-site base (vitepress config supports DOCS_BASE override)
+      - name: Build docs (base=/)
+        run: |
+          export DOCS_BASE=/
+          pnpm docs:build
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      # Push the static site to nest-openapi/nest-openapi.github.io
+      - name: Push to site repo (via deploy key)
+        uses: cpina/github-action-push-to-another-repository@v1.7.2
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with:
-          path: docs/.vitepress/dist
-
-  deploy:
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-
+          source-directory: docs/.vitepress/dist
+          destination-github-username: nest-openapi
+          destination-repository-name: nest-openapi.github.io
+          user-email: github-actions@users.noreply.github.com
+          target-branch: main

@@ -11,7 +11,7 @@ const base = (process?.env?.DOCS_BASE as string) || computedBase;
 export default {
 	title: "@nest-openapi",
 	description: "Modern, modular OpenAPI utilities for NestJS",
-  base,
+	base,
 	head: [
 		["meta", { name: "theme-color", content: "#111827" }],
 		["link", { rel: "icon", href: `${base}favicon.png` }],
@@ -21,11 +21,12 @@ export default {
 		nav: [
 			{ text: "Home", link: "/" },
 			{ text: "Validator", link: "/validator/" },
+			{ text: "Serializer", link: "/serializer/" },
 		],
 		socialLinks: [
 			{ icon: "github", link: "https://github.com/ts-oas/nest-openapi" },
 		],
-			sidebar: {
+		sidebar: {
 			"/validator/": [
 				{
 					text: "Validator",
@@ -35,6 +36,17 @@ export default {
 						{ text: "Options", link: "/validator/options" },
 						{ text: "Decorators", link: "/validator/decorators" },
 						{ text: "Manual Validation", link: "/validator/manual" },
+					],
+				},
+			],
+			"/serializer/": [
+				{
+					text: "Serializer",
+					items: [
+						{ text: "Overview", link: "/serializer/" },
+						{ text: "Options", link: "/serializer/options" },
+						{ text: "Decorators", link: "/serializer/decorators" },
+						{ text: "Manual Serialization", link: "/serializer/manual" },
 					],
 				},
 			],

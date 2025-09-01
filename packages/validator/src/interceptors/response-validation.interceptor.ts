@@ -11,19 +11,19 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Reflector } from '@nestjs/core';
 import { DebugUtil } from '@nest-openapi/runtime';
-import { VALIDATE_KEY, ValidateOptions } from '../decorators/validate.decorator';
-import { OPENAPI_VALIDATOR, OpenApiValidatorService } from '../services/openapi-validator.service';
+import { VALIDATE_OVERRIDE, ValidateOverrideOptions } from '../decorators/validate.decorator';
+import { OPENAPI_VALIDATOR, OpenAPIValidatorService } from '../services/openapi-validator.service';
 import type { ValidationError } from '../types';
 
 
 @Injectable()
 export class ResponseValidationInterceptor implements NestInterceptor {
-  private readonly logger = new Logger('OpenApiValidator');
+  private readonly logger = new Logger('OpenAPIValidator');
   private debugLog: (message: string, ...args: any[]) => void;
 
   constructor(
     @Inject(OPENAPI_VALIDATOR)
-    private readonly validatorService: OpenApiValidatorService,
+    private readonly validatorService: OpenAPIValidatorService,
     @Inject(Reflector)
     private readonly reflector: Reflector,
   ) {
@@ -81,8 +81,8 @@ export class ResponseValidationInterceptor implements NestInterceptor {
 
   private shouldValidateResponse(context: ExecutionContext): boolean {
     // Check for @Validate decorator
-    const validateMetadata = this.reflector.getAllAndOverride<ValidateOptions>(
-      VALIDATE_KEY,
+    const validateMetadata = this.reflector.getAllAndOverride<ValidateOverrideOptions>(
+      VALIDATE_OVERRIDE,
       [context.getHandler(), context.getClass()],
     );
 

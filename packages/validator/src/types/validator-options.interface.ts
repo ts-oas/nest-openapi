@@ -84,3 +84,6 @@ export interface ValidatorOptions {
    */
   debug?: boolean;
 }
+
+export const OPENAPI_VALIDATOR_RUNTIME = Symbol('OPENAPI_VALIDATOR_RUNTIME');
+export const OPENAPI_VALIDATOR_OPTIONS = Symbol('OPENAPI_VALIDATOR_OPTIONS');

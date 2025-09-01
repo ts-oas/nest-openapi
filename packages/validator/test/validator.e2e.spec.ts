@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { Controller, Get, Post, Body, Param, Query, Module, Res, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
-import { OpenApiValidatorModule } from '../src/modules/openapi-validator.module';
+import { OpenAPIValidatorModule } from '../src/modules/openapi-validator.module';
 import { Validate } from '../src/decorators/validate.decorator';
 import addFormats from 'ajv-formats';
 import Ajv from 'ajv';
@@ -65,7 +65,7 @@ describe('@nest-openapi/validator e2e', () => {
       const moduleRef = await Test.createTestingModule({
         imports: [
           TestFeatureModule,
-          OpenApiValidatorModule.forRoot({
+          OpenAPIValidatorModule.forRoot({
             specSource: { type: 'object', spec: openApiSpec },
             debug: false,
             requestValidation: { enable: true, transform: true },
@@ -168,7 +168,7 @@ describe('@nest-openapi/validator e2e', () => {
       const moduleRef = await Test.createTestingModule({
         imports: [
           TestFeatureModule,
-          OpenApiValidatorModule.forRootAsync({
+          OpenAPIValidatorModule.forRootAsync({
             useFactory: async () => ({
               specSource: { type: 'object', spec: openApiSpec },
               requestValidation: { enable: true, transform: false },
@@ -240,7 +240,7 @@ describe('@nest-openapi/validator e2e', () => {
       const moduleRef = await Test.createTestingModule({
         imports: [
           TestFeatureModule,
-          OpenApiValidatorModule.forRoot({
+          OpenAPIValidatorModule.forRoot({
             specSource: { type: 'object', spec: openApiSpec },
             requestValidation: {
               enable: true,
@@ -315,7 +315,7 @@ describe('@nest-openapi/validator e2e', () => {
       const moduleRef = await Test.createTestingModule({
         imports: [
           TestFeatureModule,
-          OpenApiValidatorModule.forRoot({
+          OpenAPIValidatorModule.forRoot({
             specSource: { type: 'object', spec: openApiSpec },
             requestValidation: { enable: true, transform: true }, // transform ignored for external instance; configured above
             responseValidation: { enable: true, skipErrorResponses: true },

@@ -1,6 +1,6 @@
 {
   "name": "@nest-openapi/runtime",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -15,6 +15,11 @@
   "files": [
     "dist"
   ],
+  "homepage": "https://nest-openapi.github.io/",
+  "repository": "https://github.com/ts-oas/nest-openapi",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --target node20 --outDir dist --clean --external @nestjs/common",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
@@ -26,6 +31,6 @@
   "devDependencies": {
     "@types/node": "^22.13.10",
     "tsup": "^8.0.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.9.0"
   }
 }

@@ -1,22 +1,22 @@
 import { Injectable, Logger, Inject, OnApplicationBootstrap } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { OpenApiRuntimeService, OpenAPISpec, DebugUtil, PlatformUtil } from '@nest-openapi/runtime';
+import { OpenAPIRuntimeService, OpenAPISpec, DebugUtil, PlatformUtil } from '@nest-openapi/runtime';
 import Ajv from 'ajv';
 import type { ValidatorOptions, ValidationError } from '../types';
+import { OPENAPI_VALIDATOR_OPTIONS, OPENAPI_VALIDATOR_RUNTIME } from '../types/validator-options.interface';
 
-export const OPENAPI_VALIDATOR_OPTIONS = 'OPENAPI_VALIDATOR_OPTIONS';
-export const OPENAPI_VALIDATOR = 'OPENAPI_VALIDATOR';
+export const OPENAPI_VALIDATOR = Symbol('OPENAPI_VALIDATOR');
 
 @Injectable()
-export class OpenApiValidatorService implements OnApplicationBootstrap {
-  private readonly logger = new Logger('OpenApiValidator');
+export class OpenAPIValidatorService implements OnApplicationBootstrap {
+  private readonly logger = new Logger('OpenAPIValidator');
   private ajv: Ajv;
   public openApiSpec: OpenAPISpec;
   private debugLog: (message: string, ...args: any[]) => void;
 
   constructor(
-    @Inject(OpenApiRuntimeService)
-    private readonly runtime: OpenApiRuntimeService,
+    @Inject(OPENAPI_VALIDATOR_RUNTIME)
+    private readonly runtime: OpenAPIRuntimeService,
     @Inject(OPENAPI_VALIDATOR_OPTIONS)
     private readonly options: ValidatorOptions,
   ) {
