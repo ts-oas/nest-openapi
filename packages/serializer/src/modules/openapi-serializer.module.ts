@@ -1,7 +1,6 @@
 import { DynamicModule, Global, Module } from "@nestjs/common";
 import { APP_INTERCEPTOR, Reflector } from "@nestjs/core";
 import { ResponseSerializerInterceptor } from "../interceptors/response-serializer.interceptor";
-import { OperationResolverService } from "../services/operation-resolver.service";
 import { OpenAPISerializerService, OPENAPI_SERIALIZER } from "../services/openapi-serializer.service";
 import {
   OPENAPI_SERIALIZER_OPTIONS,
@@ -12,7 +11,7 @@ import { OpenAPIRuntimePool } from "@nest-openapi/runtime";
 
 @Global()
 @Module({
-  providers: [OperationResolverService, OpenAPISerializerService],
+  providers: [OpenAPISerializerService],
   exports: [OpenAPISerializerService],
 })
 export class OpenAPISerializerModule {
@@ -33,9 +32,10 @@ export class OpenAPISerializerModule {
         {
           provide: OPENAPI_SERIALIZER_RUNTIME,
           useFactory: async (opts: SerializerOptions) =>
-          OpenAPIRuntimePool.getOrCreate({ specSource: opts.specSource, debug: opts.debug }),
+            OpenAPIRuntimePool.getOrCreate({ specSource: opts.specSource, debug: opts.debug }),
           inject: [OPENAPI_SERIALIZER_OPTIONS],
         },
+        OpenAPISerializerService,
         { provide: OPENAPI_SERIALIZER, useExisting: OpenAPISerializerService },
         {
           provide: APP_INTERCEPTOR,
@@ -69,7 +69,6 @@ export class OpenAPISerializerModule {
             OpenAPIRuntimePool.getOrCreate({ specSource: opts.specSource, debug: opts.debug }),
           inject: [OPENAPI_SERIALIZER_OPTIONS],
         },
-        OperationResolverService,
         OpenAPISerializerService,
         { provide: OPENAPI_SERIALIZER, useExisting: OpenAPISerializerService },
         {

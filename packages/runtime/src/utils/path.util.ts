@@ -26,3 +26,4 @@ export function pathToRegex(oasPath: string) {
     .replace(/\\\{[^}]+\\\}/g, "[^/]+");
   return new RegExp(`^${re}$`);
 }
+

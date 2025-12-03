@@ -28,6 +28,45 @@ export class PlatformUtil {
     return request.path || request.url || null;
   }
 
+  static getHeaders (request: any): Record<string, any> {
+    // Express: request.headers
+    if (request.headers) {
+      return request.headers;
+    }
+
+    // Fastify: request.raw.headers
+    if (request.raw?.headers) {
+      return request.raw.headers;
+    }
+
+    return {};
+  }
+
+  static getHeader (request: any, key: string): any {
+    const headers = this.getHeaders(request) || {};
+    if (!key) return undefined;
+
+    // Prefer exact match first
+    if (key in headers) {
+      return (headers as any)[key];
+    }
+
+    const lowerKey = key.toLowerCase();
+    const directLower = (headers as any)[lowerKey];
+    if (directLower !== undefined) {
+      return directLower;
+    }
+
+    // Fallback: scan keys case‑insensitively
+    for (const k of Object.keys(headers)) {
+      if (k.toLowerCase() === lowerKey) {
+        return (headers as any)[k];
+      }
+    }
+
+    return undefined;
+  }
+
   static getBody (request: any): any {
     return request.body;
   }

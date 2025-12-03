@@ -2,7 +2,6 @@ import { Inject, Injectable, Logger, OnApplicationBootstrap, Optional } from "@n
 import { DebugUtil, OpenAPIRuntimeService } from "@nest-openapi/runtime";
 import fastJson, { type Options as StringifyOptions } from "fast-json-stringify";
 import { bundleWithComponents, normalizeForResponse } from "../utils/oas-to-jsonschema.util";
-import { OperationResolverService } from "./operation-resolver.service";
 import {
   OPENAPI_SERIALIZER_OPTIONS,
   OPENAPI_SERIALIZER_RUNTIME,
@@ -28,8 +27,6 @@ export class OpenAPISerializerService implements OnApplicationBootstrap {
   constructor(
     @Inject(OPENAPI_SERIALIZER_RUNTIME)
     private readonly runtime: OpenAPIRuntimeService,
-    @Inject(OperationResolverService)
-    private readonly opResolver: OperationResolverService,
     @Optional() @Inject(OPENAPI_SERIALIZER_OPTIONS) readonly options: SerializerOptions,
   ) {
     this.debugLog = DebugUtil.createDebugFn(this.logger, this.options.debug || false);
@@ -53,7 +50,7 @@ export class OpenAPISerializerService implements OnApplicationBootstrap {
     if (rsOpts.enable === false) return undefined;
     if ((rsOpts.skipErrorResponses ?? true) && statusCode >= 400) return undefined;
 
-    const resolved = this.opResolver.resolve(ctx);
+    const resolved = this.runtime.operationResolver.resolve(ctx);
     if (!resolved) return undefined;
 
     // Find the best matching response + content
@@ -82,7 +79,7 @@ export class OpenAPISerializerService implements OnApplicationBootstrap {
   }
 
   private findResponseSchema (
-    resolved: import("./operation-resolver.service").ResolvedOperation,
+    resolved: import("@nest-openapi/runtime").ResolvedOperation,
     statusCode: number,
     preferContentType?: string,
   ) {

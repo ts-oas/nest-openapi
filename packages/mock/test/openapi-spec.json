@@ -1,0 +1,401 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mock Test API",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": ["id", "name", "email"],
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "age": { "type": "integer" },
+          "active": { "type": "boolean" }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": ["id", "name", "price"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string", "examples": ["Product name example"] },
+          "price": { "type": "number", "minimum": 0, "examples": [50, 60] },
+          "nested": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "examples": ["test"] },
+              "nestedValue": { "type": "number" }
+            },
+            "examples": [
+              {
+                "type": "number",
+                "nestedValue": 50
+              }
+            ]
+          },
+          "description": { "type": "string" },
+          "inStock": { "type": "boolean" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error", "message"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "code": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/users/{id}": {
+      "get": {
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" },
+                "examples": {
+                  "john": {
+                    "value": {
+                      "id": 1,
+                      "name": "John Doe",
+                      "email": "john@example.com",
+                      "age": 30,
+                      "active": true
+                    }
+                  },
+                  "jane": {
+                    "value": {
+                      "id": 2,
+                      "name": "Jane Smith",
+                      "email": "jane@example.com",
+                      "age": 25,
+                      "active": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "operationId": "listProducts",
+        "responses": {
+          "200": {
+            "description": "List of products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Product" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createProduct",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "price"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "price": { "type": "number" },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Health check",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "status": "ok"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/text": {
+      "get": {
+        "operationId": "getText",
+        "responses": {
+          "200": {
+            "description": "Plain text response",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/no-example": {
+      "get": {
+        "operationId": "noExample",
+        "responses": {
+          "200": {
+            "description": "Route with no examples",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/disabled": {
+      "get": {
+        "operationId": "disabled",
+        "responses": {
+          "200": {
+            "description": "Route where mocking is disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "real": { "type": "boolean" }
+                  }
+                },
+                "examples": {
+                  "mocked": {
+                    "value": {
+                      "real": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enabled": {
+      "get": {
+        "operationId": "enabled",
+        "responses": {
+          "200": {
+            "description": "Route where mocking is enabled via decorator",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" },
+                "examples": {
+                  "john": {
+                    "value": {
+                      "id": 1,
+                      "name": "John Doe",
+                      "email": "john@example.com",
+                      "age": 30,
+                      "active": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/custom-status": {
+      "get": {
+        "operationId": "customStatus",
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "real": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "not-found": {
+                    "value": {
+                      "error": "Not Found",
+                      "message": "Resource not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/custom-example": {
+      "get": {
+        "operationId": "customExample",
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" },
+                "examples": {
+                  "john": {
+                    "value": {
+                      "id": 1,
+                      "name": "John Doe",
+                      "email": "john@example.com",
+                      "age": 30,
+                      "active": true
+                    }
+                  },
+                  "jane": {
+                    "value": {
+                      "id": 2,
+                      "name": "Jane Smith",
+                      "email": "jane@example.com",
+                      "age": 25,
+                      "active": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/delay": {
+      "get": {
+        "operationId": "withDelay",
+        "responses": {
+          "200": {
+            "description": "Delayed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "real": { "type": "boolean" }
+                  }
+                },
+                "examples": {
+                  "delayed": {
+                    "value": {
+                      "success": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jsf-only": {
+      "get": {
+        "operationId": "jsfOnly",
+        "responses": {
+          "200": {
+            "description": "JSF generated response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Product" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/primitive-only": {
+      "get": {
+        "operationId": "primitiveOnly",
+        "responses": {
+          "200": {
+            "description": "Primitive generated response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

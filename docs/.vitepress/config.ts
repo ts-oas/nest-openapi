@@ -22,6 +22,7 @@ export default {
 			{ text: "Home", link: "/" },
 			{ text: "Validator", link: "/validator/" },
 			{ text: "Serializer", link: "/serializer/" },
+			{ text: "Mock", link: "/mock/" },
 		],
 		socialLinks: [
 			{ icon: "github", link: "https://github.com/ts-oas/nest-openapi" },
@@ -47,6 +48,18 @@ export default {
 						{ text: "Options", link: "/serializer/options" },
 						{ text: "Decorators", link: "/serializer/decorators" },
 						{ text: "Manual Serialization", link: "/serializer/manual" },
+					],
+				},
+			],
+			"/mock/": [
+				{
+					text: "Mock",
+					items: [
+						{ text: "Overview", link: "/mock/" },
+						{ text: "Options", link: "/mock/options" },
+						{ text: "Decorators", link: "/mock/decorators" },
+						{ text: "Manual Usage", link: "/mock/manual" },
+						{ text: "Recording & Replay", link: "/mock/recording" },
 					],
 				},
 			],

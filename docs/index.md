@@ -15,6 +15,9 @@ hero:
     - theme: brand
       text: Serializer
       link: /serializer/
+    - theme: brand
+      text: Mock
+      link: /mock/
     - theme: alt
       text: GitHub
       link: https://github.com/ts-oas/nest-openapi

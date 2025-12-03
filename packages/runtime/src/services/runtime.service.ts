@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { DebugUtil } from "../utils/debug.util";
 import { OpenAPISpec, SpecSource } from "../types";
 import { SchemaResolverService } from "./schema-resolver.service";
+import { OperationResolverService } from "./operation-resolver.service";
 import { createHash } from "crypto";
 export const OPENAPI_RUNTIME_OPTIONS = Symbol('OPENAPI_RUNTIME_OPTIONS');
 
@@ -13,6 +14,7 @@ export class OpenAPIRuntimeService {
   private readonly logger = new Logger('OpenAPIRuntime');
   private debugLog: (message: string, ...args: any[]) => void;
   public schemaResolver: SchemaResolverService;
+  public operationResolver: OperationResolverService;
 
   constructor(
     @Inject(OPENAPI_RUNTIME_OPTIONS)
@@ -24,6 +26,7 @@ export class OpenAPIRuntimeService {
   async onModuleInit(): Promise<typeof this> {
     await this.load();
     this.schemaResolver = new SchemaResolverService(this.spec);
+    this.operationResolver = new OperationResolverService(this.spec);
 
     return this;
   }
