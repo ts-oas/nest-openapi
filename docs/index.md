@@ -18,6 +18,9 @@ hero:
     - theme: brand
       text: Mock
       link: /mock/
+    - theme: brand
+      text: MCP
+      link: /mcp/
     - theme: alt
       text: GitHub
       link: https://github.com/ts-oas/nest-openapi

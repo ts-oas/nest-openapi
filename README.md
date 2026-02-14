@@ -23,7 +23,7 @@
 
 ## Features
 
-- **🎯 Single Source of Truth** — Your OpenAPI spec drives validation, serialization, and mocking.
+- **🎯 Single Source of Truth** — Your OpenAPI spec drives validation, serialization, mocking, and MCP tools.
 - **⚡ Fast by Design** — AJV validation and `fast-json-stringify` serialization with caching and precompilation.
 - **🔌 Drop-in Integration** — Works with existing NestJS controllers and routes
 - **🎛️ Fine-Grained Control** — Per-route opt-out and custom schema overrides
@@ -31,11 +31,12 @@
 
 ## Packages
 
-| Package                                                                              | Description                                                        | Version                                                                                                                     | Docs                                                  |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| [`@nest-openapi/validator`](https://www.npmjs.com/package/@nest-openapi/validator)   | Automatic request/response validation using your OpenAPI spec      | [![npm](https://img.shields.io/npm/v/@nest-openapi/validator.svg)](https://www.npmjs.com/package/@nest-openapi/validator)   | [📖 Docs](https://nest-openapi.github.io/validator/)  |
-| [`@nest-openapi/serializer`](https://www.npmjs.com/package/@nest-openapi/serializer) | High-performance response serialization based on your OpenAPI spec | [![npm](https://img.shields.io/npm/v/@nest-openapi/serializer.svg)](https://www.npmjs.com/package/@nest-openapi/serializer) | [📖 Docs](https://nest-openapi.github.io/serializer/) |
-| [`@nest-openapi/mock`](https://www.npmjs.com/package/@nest-openapi/mock)             | Spec-driven mock server for generating realistic mock responses    | [![npm](https://img.shields.io/npm/v/@nest-openapi/mock.svg)](https://www.npmjs.com/package/@nest-openapi/mock)             | [📖 Docs](https://nest-openapi.github.io/mock/)       |
+| Package                                                                  | Description                                                        | Version                                                                                                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| [`@nest-openapi/validator`](https://nest-openapi.github.io/validator/)   | Automatic request/response validation using your OpenAPI spec      | [![npm](https://img.shields.io/npm/v/@nest-openapi/validator.svg)](https://www.npmjs.com/package/@nest-openapi/validator)   |
+| [`@nest-openapi/serializer`](https://nest-openapi.github.io/serializer/) | High-performance response serialization based on your OpenAPI spec | [![npm](https://img.shields.io/npm/v/@nest-openapi/serializer.svg)](https://www.npmjs.com/package/@nest-openapi/serializer) |
+| [`@nest-openapi/mock`](https://nest-openapi.github.io/mock/)             | Spec-driven mock server for generating realistic mock responses    | [![npm](https://img.shields.io/npm/v/@nest-openapi/mock.svg)](https://www.npmjs.com/package/@nest-openapi/mock)             |
+| [`@nest-openapi/mcp`](https://nest-openapi.github.io/mcp/)               | Spec-driven MCP server for exposing OpenAPI operations as tools    | [![npm](https://img.shields.io/npm/v/@nest-openapi/mcp.svg)](https://www.npmjs.com/package/@nest-openapi/mcp)               |
 
 ## Quick Start
 
@@ -111,6 +112,31 @@ export class AppModule {}
 
 **Routes return mocked responses when enabled.** See [full documentation](https://nest-openapi.github.io/mock/) for advanced configuration.
 
+### MCP
+
+```bash
+npm i @nest-openapi/mcp
+```
+
+```typescript
+import { Module } from "@nestjs/common";
+import { OpenAPIMcpModule } from "@nest-openapi/mcp";
+import * as openApiSpec from "./openapi.json";
+
+@Module({
+  imports: [
+    OpenAPIMcpModule.forRoot({
+      specSource: { type: "object", spec: openApiSpec },
+      http: { path: "/mcp" },
+      executor: { baseUrl: "http://127.0.0.1:3000" },
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+**Expose OpenAPI operations as MCP tools.** See [full documentation](https://nest-openapi.github.io/mcp/) for advanced configuration.
+
 ## Usage Examples
 
 ### Manual Validation
@@ -126,7 +152,7 @@ import {
 export class MyService {
   constructor(
     @Inject(OPENAPI_VALIDATOR)
-    private readonly validator: OpenAPIValidatorService
+    private readonly validator: OpenAPIValidatorService,
   ) {}
 
   validate(ctx: HttpArgumentsHost) {
@@ -159,7 +185,7 @@ export class BooksController {
 ## Compatibility
 
 - Works with NestJS v9+
-- Supports Express and Fastify adopters
+- Supports Express and Fastify adapters
 
 ## Contributing
 
