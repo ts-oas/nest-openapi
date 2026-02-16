@@ -23,6 +23,7 @@ export default {
 			{ text: "Validator", link: "/validator/" },
 			{ text: "Serializer", link: "/serializer/" },
 			{ text: "Mock", link: "/mock/" },
+			{ text: "MCP", link: "/mcp/" },
 		],
 		socialLinks: [
 			{ icon: "github", link: "https://github.com/ts-oas/nest-openapi" },
@@ -60,6 +61,17 @@ export default {
 						{ text: "Decorators", link: "/mock/decorators" },
 						{ text: "Manual Usage", link: "/mock/manual" },
 						{ text: "Recording & Replay", link: "/mock/recording" },
+					],
+				},
+			],
+			"/mcp/": [
+				{
+					text: "MCP",
+					items: [
+						{ text: "Overview", link: "/mcp/" },
+						{ text: "Advanced setup", link: "/mcp/advanced-setup" },
+						{ text: "Options", link: "/mcp/options" },
+						{ text: "Manual Usage", link: "/mcp/manual" },
 					],
 				},
 			],
