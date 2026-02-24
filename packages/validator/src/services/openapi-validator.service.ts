@@ -294,7 +294,7 @@ export class OpenAPIValidatorService implements OnApplicationBootstrap {
         continue;
       }
 
-      if (value !== undefined && param.schema) {
+      if (param.schema) {
         const schema = this.runtime.schemaResolver.resolveSchema(param.schema);
         if (schema) {
           const paramValue = { value };

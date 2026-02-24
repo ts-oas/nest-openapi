@@ -1,6 +1,6 @@
 {
   "name": "@nest-openapi/validator",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Automatic request/response validation for NestJS using your OpenAPI specifications",
   "sideEffects": false,
   "keywords": [
@@ -13,6 +13,19 @@
     "typescript",
     "schema"
   ],
+  "homepage": "https://nest-openapi.github.io/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ts-oas/nest-openapi.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Alireza Malek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ts-oas/nest-openapi/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
@@ -37,19 +50,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
-  "homepage": "https://nest-openapi.github.io/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ts-oas/nest-openapi.git"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "author": "Alireza Malek",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ts-oas/nest-openapi/issues"
-  },
   "peerDependencies": {
     "@nestjs/common": "^9.0.0 || ^10.0.0 || ^11.0.0",
     "@nestjs/core": "^9.0.0 || ^10.0.0 || ^11.0.0",
@@ -62,7 +62,7 @@
     }
   },
   "dependencies": {
-    "@nest-openapi/runtime": "^0.1.1",
+    "@nest-openapi/runtime": "^0.1.2",
     "ajv": "^8.0.0",
     "rxjs": "^7.2.0"
   },
