@@ -146,6 +146,20 @@ describe('@nest-openapi/validator e2e', () => {
         });
     });
 
+    it('applies default values for optional parameters with transform enabled', async () => {
+      const server = app.getHttpServer();
+
+      // When active parameter is not provided, default value should be applied
+      await request(server)
+        .get('/users/1')
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toEqual(
+            expect.objectContaining({ id: 1, active: true }), // default value from schema
+          );
+        });
+    });
+
     it('skips response validation for error status when skipErrorResponses is true', async () => {
       const server = app.getHttpServer();
 
