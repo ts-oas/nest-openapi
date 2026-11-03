@@ -231,8 +231,13 @@ function generateSuccessOutputSchema(
         : rawResponse;
     if (!response?.content) continue;
 
-    const jsonContent = response.content['application/json'];
-    const schema = jsonContent?.schema;
+    const content = response.content;
+    const contentEntry =
+      content['application/json'] ??
+      content['*/*'] ??
+      Object.entries(content).find(([key]) => key.includes('json') || key === '*/*')?.[1];
+
+    const schema = contentEntry?.schema;
     if (!schema) continue;
 
     const mapped = mapOpenApiSchemaToJsonSchema(
@@ -240,7 +245,18 @@ function generateSuccessOutputSchema(
       resolveRef,
     );
 
-    if (typeof mapped === 'object') return mapped;
+    if (typeof mapped === 'object' && mapped !== null) {
+      const isObject =
+        mapped.type === 'object' ||
+        (Array.isArray(mapped.type) && mapped.type.includes('object')) ||
+        (!mapped.type && (typeof mapped.properties === 'object' || Array.isArray((mapped as any).allOf)));
+      if (isObject) {
+        return {
+          ...mapped,
+          type: 'object',
+        };
+      }
+    }
   }
 
   return undefined;

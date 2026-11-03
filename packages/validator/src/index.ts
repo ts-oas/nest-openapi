@@ -5,4 +5,6 @@ export { OPENAPI_VALIDATOR, OpenAPIValidatorService } from './services/openapi-v
 export { Validate } from './decorators/validate.decorator';
 export type { ValidateOverrideOptions } from './decorators/validate.decorator';
 
+export type { HttpArgumentsHost } from '@nest-openapi/runtime';
+
 export type * from './types/index';

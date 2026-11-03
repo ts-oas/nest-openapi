@@ -1,6 +1,6 @@
 import { Injectable, Logger, Inject, OnApplicationBootstrap } from '@nestjs/common';
-import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { OpenAPIRuntimeService, OpenAPISpec, DebugUtil, PlatformUtil } from '@nest-openapi/runtime';
+
+import { OpenAPIRuntimeService, OpenAPISpec, DebugUtil, PlatformUtil, type HttpArgumentsHost } from '@nest-openapi/runtime';
 import Ajv from 'ajv';
 import type { ValidatorOptions, ValidationError } from '../types';
 import { OPENAPI_VALIDATOR_OPTIONS, OPENAPI_VALIDATOR_RUNTIME } from '../types/validator-options.interface';

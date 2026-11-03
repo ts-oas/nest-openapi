@@ -5,3 +5,4 @@ export { ResolvedOperation } from "./services/operation-resolver.service";
 export { DebugUtil } from "./utils/debug.util";
 export { PlatformUtil } from "./utils/platform.util";
 export { getHttpDetails, pathToRegex, toOpenAPIPathPattern } from "./utils/path.util";
+export type { HttpArgumentsHost } from "./utils/platform.util";

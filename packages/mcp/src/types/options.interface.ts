@@ -13,6 +13,12 @@ export interface OpenAPIMcpToolsOptions {
    * @example "api_"
    */
   namePrefix?: string;
+  /**
+   * Map 2xx success response schemas from OpenAPI operations to MCP tool output schemas.
+   * Only object-type response schemas are mapped.
+   * @default true
+   */
+  mapOutputSchema?: boolean;
 }
 
 export interface OpenAPIMcpHttpOptions {

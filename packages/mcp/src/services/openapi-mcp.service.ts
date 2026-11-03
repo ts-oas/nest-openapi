@@ -52,6 +52,7 @@ export class OpenAPIMcpService implements OnModuleInit, OnModuleDestroy {
       tools: {
         defaultInclude: this.options.tools?.defaultInclude ?? false,
         namePrefix: this.options.tools?.namePrefix,
+        mapOutputSchema: this.options.tools?.mapOutputSchema ?? true,
       },
     });
 
@@ -168,7 +169,15 @@ export class OpenAPIMcpService implements OnModuleInit, OnModuleDestroy {
 
         if (result.ok) {
           this.debugLog(`MCP tool "${tool.name}" completed with status=${result.status}`);
-          return { content: [{ type: 'text' as const, text }] };
+          const structuredContent =
+            tool.outputSchema && typeof payload === 'object' && payload !== null && !Array.isArray(payload)
+              ? payload
+              : undefined;
+
+          return {
+            content: [{ type: 'text' as const, text }],
+            ...(structuredContent ? { structuredContent } : {}),
+          };
         }
 
         this.debugLog(`MCP tool "${tool.name}" returned error status=${result.status}`);
