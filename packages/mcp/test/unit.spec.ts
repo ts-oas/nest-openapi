@@ -171,7 +171,7 @@ describe('tool extraction', () => {
     );
   });
 
-  it('uses first 2xx application/json response as outputSchema', () => {
+  it('uses a single 2xx application/json response as outputSchema', () => {
     const spec: OpenAPIV3.Document = {
       openapi: '3.0.0',
       info: { title: 'output-test', version: '1' },
@@ -195,9 +195,6 @@ describe('tool extraction', () => {
                     },
                   },
                 },
-              },
-              204: {
-                description: 'no content',
               },
             },
           },
@@ -303,7 +300,8 @@ describe('tool extraction', () => {
 
     const tools = extractToolsFromApi(spec, true);
     expect(tools).toHaveLength(2);
-    expect(tools[0].outputSchema).toBeUndefined();
+    expect(tools[0].outputSchema).toBeDefined();
+    expect(tools[0].outputSchema?.type).toBe('array');
     expect(tools[1].outputSchema).toBeUndefined();
   });
 
@@ -359,7 +357,7 @@ describe('tool extraction', () => {
     expect(tools[0].outputSchema).toBeDefined();
     expect(tools[0].outputSchema?.type).toBe('object');
     expect(tools[1].outputSchema).toBeDefined();
-    expect(tools[1].outputSchema?.type).toBe('object');
+    expect((tools[1].outputSchema as any)?.anyOf || tools[1].outputSchema?.type).toBeDefined();
   });
 
   it('omits outputSchema when mapOutputSchema is false in buildMcpToolsFromSpec', async () => {

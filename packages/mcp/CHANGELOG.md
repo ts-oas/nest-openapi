@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.2]
+
+- Fixed output schema extraction to cover all declared 2xx responses (combining distinct status schemas with `anyOf` and deduplicating identical ones), while safely omitting validation when any response has an empty body (e.g. `204 No Content`) or non-JSON media type.
+- Added structured output wrapping (`{ result: payload }`) for non-object responses (arrays, primitives, nullables, and unions) to satisfy MCP object output schema specifications.
+
 ## [0.1.1]
 
 - Added `mapOutputSchema` option to `OpenAPIMcpToolsOptions` (defaults to `true`) to control whether response schemas are mapped to MCP tool output schemas.

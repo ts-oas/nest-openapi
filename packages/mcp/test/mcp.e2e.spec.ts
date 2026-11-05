@@ -48,7 +48,24 @@ const spec = {
           { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
           { name: 'details', in: 'query', schema: { type: 'boolean' } },
         ],
-        responses: { '200': { description: 'ok' } },
+        responses: {
+          '200': {
+            description: 'ok',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    details: { type: 'boolean' },
+                    method: { type: 'string' },
+                  },
+                  required: ['id', 'details', 'method'],
+                },
+              },
+            },
+          },
+        },
       },
     },
     '/target/items': {
@@ -145,6 +162,9 @@ describe('@nest-openapi/mcp e2e', () => {
 
     expect(JSON.stringify(callRes.body)).toContain('getUser');
     expect(JSON.stringify(callRes.body)).toContain('7');
+    expect(callRes.body.result.isError).not.toBe(true);
+    expect(callRes.body.result.structuredContent).toEqual({ id: '7', details: true, method: 'getUser' });
+    expect(JSON.parse(callRes.body.result.content[0].text)).toEqual(callRes.body.result.structuredContent);
   });
 
   it('should list tools with correct inputSchema', async () => {
@@ -159,6 +179,8 @@ describe('@nest-openapi/mcp e2e', () => {
     expect(getUserTool).toBeDefined();
     expect(getUserTool.inputSchema.properties).toHaveProperty('id');
     expect(getUserTool.inputSchema.properties).toHaveProperty('details');
+    expect(getUserTool.outputSchema.type).toBe('object');
+    expect(getUserTool.outputSchema.required).toEqual(expect.arrayContaining(['id', 'details', 'method']));
   });
 
   it('should execute createItem tool (POST with body)', async () => {

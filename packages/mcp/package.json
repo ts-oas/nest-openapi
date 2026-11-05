@@ -1,6 +1,6 @@
 {
   "name": "@nest-openapi/mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Spec-driven MCP server for exposing OpenAPI operations as tools",
   "sideEffects": false,
   "keywords": [

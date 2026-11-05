@@ -153,30 +153,47 @@ export class OpenAPIMcpService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /**
+   * Registers an OpenAPI operation with matching MCP input and output contracts.
+   * Successful executions return text and structured content; non-object output
+   * contracts use a result wrapper to keep the structured content object-shaped.
+   *
+   * @param server MCP server that receives the tool registration
+   * @param tool Extracted operation metadata, execution details, and JSON schemas
+   */
   private registerTool(server: McpServer, tool: McpToolDefinition) {
+    // MCP structured content must be an object, so wrap other response shapes.
+    const wrapOutput = tool.outputSchema && tool.outputSchema.type !== 'object';
+    const outputSchema = tool.outputSchema
+      ? z.fromJSONSchema(tool.outputSchema as z.core.JSONSchema.JSONSchema)
+      : undefined;
+
     server.registerTool(tool.name, {
       title: tool.name,
       description: tool.description,
       inputSchema: z.fromJSONSchema(tool.inputSchema as z.core.JSONSchema.JSONSchema),
-      outputSchema: tool.outputSchema ? z.fromJSONSchema(tool.outputSchema as z.core.JSONSchema.JSONSchema) : undefined,
+      outputSchema: wrapOutput ? z.object({ result: outputSchema }) : outputSchema,
     }, async (args: any, extra: any) => {
       try {
         const allowlist = this.options.executor?.forwardHeaders ?? ['authorization'];
         const forwarded = this.pickForwardHeaders(extra?.requestInfo?.headers ?? {}, allowlist);
         const result = await this.executor.execute(tool, args, { forwardHeaders: forwarded });
-        const payload = result.json ?? result.text;
+        const payload = result.json !== undefined ? result.json : result.text;
         const text = typeof payload === 'string' ? payload : JSON.stringify(payload);
 
         if (result.ok) {
           this.debugLog(`MCP tool "${tool.name}" completed with status=${result.status}`);
-          const structuredContent =
-            tool.outputSchema && typeof payload === 'object' && payload !== null && !Array.isArray(payload)
-              ? payload
-              : undefined;
+          const structuredContent = wrapOutput
+            ? { result: payload }
+            : (tool.outputSchema && (Array.isArray(payload) || payload === null || typeof payload !== 'object'))
+              ? undefined
+              : (payload === null || typeof payload !== 'object' || Array.isArray(payload))
+                ? { result: payload }
+                : payload;
 
           return {
             content: [{ type: 'text' as const, text }],
-            ...(structuredContent ? { structuredContent } : {}),
+            structuredContent,
           };
         }
 

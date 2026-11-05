@@ -1,5 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
-import type { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
+import type { JSONSchema7 } from 'json-schema';
 import { McpToolDefinition } from '../types/index';
 import { shouldIncludeOperation } from './x-mcp.filter';
 
@@ -204,6 +204,14 @@ export function generateInputSchemaAndDetails(
   return { inputSchema, parameters: allParameters, requestBodyContentType };
 }
 
+/**
+ * Combines the JSON schemas of all declared 2xx responses into one output contract.
+ *
+ * @param operation Operation whose successful responses define the tool output
+ * @param api Document used to resolve local response and schema references
+ * @returns A single schema or an anyOf union, or undefined when a success response
+ * has no body, no schema, an unresolved response reference, or a non-JSON media type
+ */
 function generateSuccessOutputSchema(
   operation: OpenAPIV3.OperationObject,
   api?: OpenAPIV3.Document,
@@ -220,46 +228,50 @@ function generateSuccessOutputSchema(
     ...statusCodes,
     ...(['2XX', '2xx'] as const).filter((code) => responses[code]),
   ];
+  if (!candidateCodes.length) return undefined;
+
+  const schemas = new Map<string, JSONSchema7>();
 
   for (const code of candidateCodes) {
     const rawResponse = responses[code as keyof typeof responses];
-    if (!rawResponse) continue;
+    if (!rawResponse) return undefined;
 
     const response =
       '$ref' in rawResponse
         ? (resolveRef(rawResponse.$ref) as OpenAPIV3.ResponseObject)
         : rawResponse;
-    if (!response?.content) continue;
 
-    const content = response.content;
-    const contentEntry =
-      content['application/json'] ??
-      content['*/*'] ??
-      Object.entries(content).find(([key]) => key.includes('json') || key === '*/*')?.[1];
+    const content = Object.entries(response?.content ?? {});
+    // A single output contract must cover every documented success response,
+    // including empty bodies and alternative media types.
+    if (!content.length) return undefined;
 
-    const schema = contentEntry?.schema;
-    if (!schema) continue;
-
-    const mapped = mapOpenApiSchemaToJsonSchema(
-      schema as OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
-      resolveRef,
-    );
-
-    if (typeof mapped === 'object' && mapped !== null) {
-      const isObject =
-        mapped.type === 'object' ||
-        (Array.isArray(mapped.type) && mapped.type.includes('object')) ||
-        (!mapped.type && (typeof mapped.properties === 'object' || Array.isArray((mapped as any).allOf)));
-      if (isObject) {
-        return {
-          ...mapped,
-          type: 'object',
-        };
+    for (const [contentType, mediaType] of content) {
+      if (
+        (contentType !== 'application/json' && !contentType.includes('json') && contentType !== '*/*') ||
+        !mediaType.schema
+      ) {
+        return undefined;
       }
+
+      const mapped = mapOpenApiSchemaToJsonSchema(mediaType.schema, resolveRef);
+      if (typeof mapped !== 'object') return undefined;
+
+      const normalized: JSONSchema7 =
+        typeof mapped === 'object' &&
+        mapped !== null &&
+        !mapped.type &&
+        ((mapped as any).properties || Array.isArray((mapped as any).allOf))
+          ? { ...mapped, type: 'object' }
+          : mapped;
+
+      schemas.set(JSON.stringify(normalized), normalized);
     }
   }
 
-  return undefined;
+  const successSchemas = [...schemas.values()];
+  if (!successSchemas.length) return undefined;
+  return successSchemas.length === 1 ? successSchemas[0] : { anyOf: successSchemas };
 }
 
 function resolveParameters(
@@ -297,6 +309,7 @@ function mergeParameters(
  * Maps an OpenAPI schema to a JSON Schema with cycle protection.
  *
  * @param schema OpenAPI schema object or reference
+ * @param resolveRef Optional resolver for referenced OpenAPI schemas
  * @param seen WeakSet tracking already visited schema objects
  * @returns JSON Schema representation
  */
@@ -314,11 +327,14 @@ export function mapOpenApiSchemaToJsonSchema(
     if (resolveRef) {
       const resolved = resolveRef(schema.$ref);
       if (resolved && typeof resolved === 'object') {
-        return mapOpenApiSchemaToJsonSchema(
+        const mapped = mapOpenApiSchemaToJsonSchema(
           resolved as OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
           resolveRef,
           seen,
         );
+        return (schema as OpenAPIV3.ReferenceObject & { nullable?: boolean }).nullable
+          ? { anyOf: [mapped, { type: 'null' }] }
+          : mapped;
       }
     }
 
@@ -350,17 +366,6 @@ export function mapOpenApiSchemaToJsonSchema(
     delete (jsonSchema as any).deprecated;
     delete (jsonSchema as any).readOnly;
     delete (jsonSchema as any).writeOnly;
-
-    // Handle nullable properties by adding null to the type
-    if (schema.nullable) {
-      if (Array.isArray(jsonSchema.type)) {
-        if (!jsonSchema.type.includes('null')) jsonSchema.type.push('null');
-      } else if (typeof jsonSchema.type === 'string') {
-        jsonSchema.type = [jsonSchema.type as JSONSchema7TypeName, 'null'];
-      } else if (!jsonSchema.type) {
-        jsonSchema.type = 'null';
-      }
-    }
 
     // Recursively process object properties
     if (jsonSchema.type === 'object' && jsonSchema.properties) {
@@ -431,7 +436,9 @@ export function mapOpenApiSchemaToJsonSchema(
       );
     }
 
-    return jsonSchema;
+    // Apply nullability after mapping so nested refs and enum/composition
+    // constraints are preserved for non-null values.
+    return schema.nullable ? { anyOf: [jsonSchema, { type: 'null' }] } : jsonSchema;
   } finally {
     seen.delete(schema);
   }
