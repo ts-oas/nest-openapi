@@ -1,11 +1,18 @@
 # Overview
 
+<div class="badges">
+  <a href="https://www.npmjs.com/package/@nest-openapi/mcp" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/npm/v/@nest-openapi/mcp.svg" alt="npm" /></a>
+  <a href="https://www.npmjs.com/package/@nest-openapi/mcp" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/npm/dm/%40nest-openapi%2Fmcp" alt="NPM Downloads" /></a>
+  <a href="https://github.com/ts-oas/nest-openapi/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/license/ts-oas/nest-openapi" alt="License" /></a>
+  <a href="https://deepwiki.com/ts-oas/nest-openapi" target="_blank" rel="noopener noreferrer"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
+</div>
+
 `@nest-openapi/mcp` turns your OpenAPI 3.x operations into MCP tools for NestJS applications.
 
-- **Spec-driven** — Tools are generated from OpenAPI operations.
-- **API contract ↔ MCP contract** — Request/input and success response/output OpenAPI schemas are mapped into MCP tool schemas.
-- **Secure by default** — Tool exposure is opt-in by default (`x-mcp: true` per operation).
-- **NestJS-native** — HTTP transport integration plus programmatic server APIs.
+- **LLM & Agent Ready** — Expose your NestJS OpenAPI operations directly as tools for any MCP-compatible client. Automatically dispatches tool invocations to your live API or backend services.
+- **API contract ↔ MCP contract** — Tool names, descriptions, input schemas, and output definitions are automatically derived from your OpenAPI spec.
+- **Secure by default** — Tool exposure is opt-in by default (`x-mcp: true` per operation), avoiding unintended tool exposure.
+- **NestJS-native** — HTTP transport integration plus programmatic server APIs, powered by [`@modelcontextprotocol/sdk`](https://modelcontextprotocol.io/).
 
 ### Install
 

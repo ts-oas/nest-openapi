@@ -6,10 +6,10 @@ Inject the `OpenAPIValidatorService` using the `OPENAPI_VALIDATOR` token for cus
 
 ```typescript
 import { Injectable, Inject } from "@nestjs/common";
-import { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import {
   OPENAPI_VALIDATOR,
   OpenAPIValidatorService,
+  type HttpArgumentsHost,
 } from "@nest-openapi/validator";
 
 @Injectable()

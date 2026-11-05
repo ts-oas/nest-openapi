@@ -1,10 +1,17 @@
 # Overview
 
-`@nest-openapi/mock` provides spec-driven mock server capabilities for NestJS applications. Generate realistic mock responses automatically from your OpenAPI 3.x specification.
+<div class="badges">
+  <a href="https://www.npmjs.com/package/@nest-openapi/mock" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/npm/v/@nest-openapi/mock.svg" alt="npm" /></a>
+  <a href="https://www.npmjs.com/package/@nest-openapi/mock" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/npm/dm/%40nest-openapi%2Fmock" alt="NPM Downloads" /></a>
+  <a href="https://github.com/ts-oas/nest-openapi/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/license/ts-oas/nest-openapi" alt="License" /></a>
+  <a href="https://deepwiki.com/ts-oas/nest-openapi" target="_blank" rel="noopener noreferrer"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
+</div>
 
-- **Spec-driven** — Mock responses generated directly from your OpenAPI spec
-- **Multiple strategies** — Examples, JSON Schema Faker, or primitive values
-- **Flexible** — Per-route overrides, request hints, and recording/replay
+`@nest-openapi/mock` provides spec-driven mock server capabilities for NestJS applications.
+
+- **Spec-driven** — Automatically generate mock responses matching your OpenAPI specifications.
+- **Multiple strategies** — Schema examples, JSON Schema Faker, primitive values, or recorded fixtures.
+- **Flexible** — Configure globally and per-route overrides (`@Mock()`), simulate network latency, HTTP header hints to trigger, and more.
 
 ### Install
 
