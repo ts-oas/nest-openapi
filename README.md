@@ -29,12 +29,12 @@
 
 ## Packages
 
-| Package                                                                  | Description                                                        | Version                                                                                                                     |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| [`@nest-openapi/validator`](https://nest-openapi.github.io/validator/)   | Automatic request/response validation using your OpenAPI spec      | [![npm](https://img.shields.io/npm/v/@nest-openapi/validator.svg)](https://www.npmjs.com/package/@nest-openapi/validator)   |
-| [`@nest-openapi/serializer`](https://nest-openapi.github.io/serializer/) | High-performance response serialization based on your OpenAPI spec | [![npm](https://img.shields.io/npm/v/@nest-openapi/serializer.svg)](https://www.npmjs.com/package/@nest-openapi/serializer) |
-| [`@nest-openapi/mock`](https://nest-openapi.github.io/mock/)             | Spec-driven mock server for generating realistic mock responses    | [![npm](https://img.shields.io/npm/v/@nest-openapi/mock.svg)](https://www.npmjs.com/package/@nest-openapi/mock)             |
-| [`@nest-openapi/mcp`](https://nest-openapi.github.io/mcp/)               | Spec-driven MCP server for exposing OpenAPI operations as tools    | [![npm](https://img.shields.io/npm/v/@nest-openapi/mcp.svg)](https://www.npmjs.com/package/@nest-openapi/mcp)               |
+| Package                                                                              | Description                                                        |                     Documentation                     |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------ | :---------------------------------------------------: |
+| [`@nest-openapi/validator`](https://www.npmjs.com/package/@nest-openapi/validator)   | Automatic request/response validation using your OpenAPI spec      | [📖 Docs](https://nest-openapi.github.io/validator/)  |
+| [`@nest-openapi/serializer`](https://www.npmjs.com/package/@nest-openapi/serializer) | High-performance response serialization based on your OpenAPI spec | [📖 Docs](https://nest-openapi.github.io/serializer/) |
+| [`@nest-openapi/mock`](https://www.npmjs.com/package/@nest-openapi/mock)             | Spec-driven mock server for generating realistic mock responses    |    [📖 Docs](https://nest-openapi.github.io/mock/)    |
+| [`@nest-openapi/mcp`](https://www.npmjs.com/package/@nest-openapi/mcp)               | Spec-driven MCP server for exposing OpenAPI operations as tools    |    [📖 Docs](https://nest-openapi.github.io/mcp/)     |
 
 ## Quick Start
 
@@ -144,6 +144,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import {
   OPENAPI_VALIDATOR,
   OpenAPIValidatorService,
+  type HttpArgumentsHost,
 } from "@nest-openapi/validator";
 
 @Injectable()

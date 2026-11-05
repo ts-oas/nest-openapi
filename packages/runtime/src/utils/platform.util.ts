@@ -1,4 +1,6 @@
-import { HttpArgumentsHost } from '@nestjs/common/interfaces';
+import type { ArgumentsHost } from '@nestjs/common';
+
+export type HttpArgumentsHost = ReturnType<ArgumentsHost['switchToHttp']>;
 
 /**
  * Platform-agnostic utility functions for extracting request data
@@ -10,9 +12,13 @@ export class PlatformUtil {
   }
 
   static getRoutePath (request: any): string | null {
+    const baseUrl = (request.baseUrl || '').replace(/\/+$/, '');
+
     // Express: request.route?.path
     if (request.route?.path) {
-      return request.route.path;
+      const routePath = request.route.path.startsWith('/') ? request.route.path : `/${request.route.path}`;
+      const combined = `${baseUrl}${routePath}`.replace(/\/+/g, '/');
+      return (combined.length > 1 && combined.endsWith('/')) ? combined.slice(0, -1) : combined;
     }
 
     // Fastify: request.routerPath or request.routeOptions?.url
@@ -24,8 +30,17 @@ export class PlatformUtil {
       return request.routeOptions.url;
     }
 
-    // Fallback to request.path or request.url
-    return request.path || request.url || null;
+    // Fallback to request.path or request.url (stripping query string)
+    const rawUrl = request.path || (typeof request.url === 'string' ? request.url.split('?')[0] : null);
+    if (!rawUrl) return null;
+
+    let path = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
+    if (baseUrl && !path.startsWith(baseUrl)) {
+      path = `${baseUrl}${path}`;
+    }
+
+    const normalized = path.replace(/\/+/g, '/');
+    return (normalized.length > 1 && normalized.endsWith('/')) ? normalized.slice(0, -1) : normalized;
   }
 
   static getHeaders (request: any): Record<string, any> {

@@ -228,6 +228,8 @@ function generateSuccessOutputSchema(
     ...statusCodes,
     ...(['2XX', '2xx'] as const).filter((code) => responses[code]),
   ];
+  if (!candidateCodes.length) return undefined;
+
   const schemas = new Map<string, JSONSchema7>();
 
   for (const code of candidateCodes) {
@@ -238,18 +240,32 @@ function generateSuccessOutputSchema(
       '$ref' in rawResponse
         ? (resolveRef(rawResponse.$ref) as OpenAPIV3.ResponseObject)
         : rawResponse;
+
     const content = Object.entries(response?.content ?? {});
     // A single output contract must cover every documented success response,
     // including empty bodies and alternative media types.
     if (!content.length) return undefined;
 
     for (const [contentType, mediaType] of content) {
-      if (contentType !== 'application/json' || !mediaType.schema) return undefined;
+      if (
+        (contentType !== 'application/json' && !contentType.includes('json') && contentType !== '*/*') ||
+        !mediaType.schema
+      ) {
+        return undefined;
+      }
 
       const mapped = mapOpenApiSchemaToJsonSchema(mediaType.schema, resolveRef);
       if (typeof mapped !== 'object') return undefined;
 
-      schemas.set(JSON.stringify(mapped), mapped);
+      const normalized: JSONSchema7 =
+        typeof mapped === 'object' &&
+        mapped !== null &&
+        !mapped.type &&
+        ((mapped as any).properties || Array.isArray((mapped as any).allOf))
+          ? { ...mapped, type: 'object' }
+          : mapped;
+
+      schemas.set(JSON.stringify(normalized), normalized);
     }
   }
 

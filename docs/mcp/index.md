@@ -1,11 +1,18 @@
 # Overview
 
+<div class="badges">
+  <a href="https://www.npmjs.com/package/@nest-openapi/mcp" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/npm/v/@nest-openapi/mcp.svg" alt="npm" /></a>
+  <a href="https://www.npmjs.com/package/@nest-openapi/mcp" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/npm/dm/%40nest-openapi%2Fmcp" alt="NPM Downloads" /></a>
+  <a href="https://github.com/ts-oas/nest-openapi/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/license/ts-oas/nest-openapi" alt="License" /></a>
+  <a href="https://deepwiki.com/ts-oas/nest-openapi" target="_blank" rel="noopener noreferrer"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
+</div>
+
 `@nest-openapi/mcp` turns your OpenAPI 3.x operations into MCP tools for NestJS applications.
 
-- **Spec-driven** — Tools are generated from OpenAPI operations.
-- **API contract ↔ MCP contract** — Request/input and success response/output OpenAPI schemas are mapped into MCP tool schemas.
-- **Secure by default** — Tool exposure is opt-in by default (`x-mcp: true` per operation).
-- **NestJS-native** — HTTP transport integration plus programmatic server APIs.
+- **LLM & Agent Ready** — Expose your NestJS OpenAPI operations directly as tools for any MCP-compatible client. Automatically dispatches tool invocations to your live API or backend services.
+- **API contract ↔ MCP contract** — Tool names, descriptions, input schemas, and output definitions are automatically derived from your OpenAPI spec.
+- **Secure by default** — Tool exposure is opt-in by default (`x-mcp: true` per operation), avoiding unintended tool exposure.
+- **NestJS-native** — HTTP transport integration plus programmatic server APIs, powered by [`@modelcontextprotocol/sdk`](https://modelcontextprotocol.io/).
 
 ### Install
 
@@ -48,31 +55,6 @@ paths:
 ```
 
 You can change this behavior using [`tools.defaultInclude`](/mcp/options#tools).
-
-### Tool Responses and Output Schemas
-
-Successful tool calls return both text `content` and JSON `structuredContent`.
-Text content keeps the original response payload for compatibility.
-
-When every declared success response has an `application/json` schema, the tool's
-`outputSchema` covers all 2xx responses, including `2XX` ranges. Different success
-schemas are combined with `anyOf`; identical mapped schemas share one contract.
-Local references and nullable schemas are supported. Combined schemas and schemas
-without `type: object` use an object schema with a required `result` property,
-and their structured content always uses that wrapper. A single schema with
-`type: object` returns the response object directly in `structuredContent`.
-If any success response has no body, lacks a schema, has an unresolved response
-reference, or advertises a media type other than `application/json`, no output schema is
-registered, so valid success responses are not rejected by an incomplete contract.
-Without an output schema, objects are returned directly; arrays, primitives, and
-`null` are wrapped as `{ result: payload }`.
-
-For example, an array response `[ { "id": "7" } ]` is returned as
-`structuredContent: { result: [{ id: "7" }] }`, while its text content remains
-`[{"id":"7"}]`.
-
-Upstream HTTP failures and execution errors return `isError: true` with text
-content rather than structured success data.
 
 ## Next Steps
 

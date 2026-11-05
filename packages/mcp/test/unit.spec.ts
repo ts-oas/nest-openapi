@@ -2,6 +2,7 @@ import { withStableUniqueNames } from '../src/openapi/tool.naming';
 import { getIncludedOperations } from '../src/openapi/x-mcp.filter';
 import { FetchMcpExecutor } from '../src/executor/fetch.executor';
 import { extractToolsFromApi } from '../src/openapi/tool-extractor';
+import { buildMcpToolsFromSpec } from '../src/openapi/tools.factory';
 import { OpenAPIV3 } from 'openapi-types';
 
 describe('x-mcp filtering', () => {
@@ -214,6 +215,191 @@ describe('tool extraction', () => {
     );
   });
 
+  it('extracts outputSchema from */* response content', () => {
+    const spec: OpenAPIV3.Document = {
+      openapi: '3.0.0',
+      info: { title: 'wildcard-output', version: '1' },
+      paths: {
+        '/authors/{id}': {
+          get: {
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+            responses: {
+              200: {
+                description: 'author',
+                content: {
+                  '*/*': {
+                    schema: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        age: { type: 'number' },
+                      },
+                      required: ['name'],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const tools = extractToolsFromApi(spec, true);
+    expect(tools).toHaveLength(1);
+    expect(tools[0].outputSchema).toEqual(
+      expect.objectContaining({
+        type: 'object',
+        properties: expect.objectContaining({
+          name: expect.objectContaining({ type: 'string' }),
+          age: expect.objectContaining({ type: 'number' }),
+        }),
+        required: ['name'],
+      }),
+    );
+  });
+
+  it('skips outputSchema if response schema is not an object (e.g. array or primitive)', () => {
+    const spec: OpenAPIV3.Document = {
+      openapi: '3.0.0',
+      info: { title: 'non-object-output', version: '1' },
+      paths: {
+        '/authors': {
+          get: {
+            responses: {
+              200: {
+                description: 'list',
+                content: {
+                  '*/*': {
+                    schema: {
+                      type: 'array',
+                      items: { type: 'string' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '/health': {
+          get: {
+            responses: {
+              200: {
+                description: 'health',
+                content: {
+                  'text/plain': {
+                    schema: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const tools = extractToolsFromApi(spec, true);
+    expect(tools).toHaveLength(2);
+    expect(tools[0].outputSchema).toBeDefined();
+    expect(tools[0].outputSchema?.type).toBe('array');
+    expect(tools[1].outputSchema).toBeUndefined();
+  });
+
+  it('extracts outputSchema from allOf and nullable object response schemas', () => {
+    const spec: OpenAPIV3.Document = {
+      openapi: '3.0.0',
+      info: { title: 'allof-nullable', version: '1' },
+      paths: {
+        '/authors/{id}': {
+          get: {
+            responses: {
+              200: {
+                description: 'author with allOf',
+                content: {
+                  'application/json': {
+                    schema: {
+                      allOf: [
+                        {
+                          type: 'object',
+                          properties: { id: { type: 'string' } },
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '/books/{id}': {
+          get: {
+            responses: {
+              200: {
+                description: 'book with nullable',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      nullable: true,
+                      properties: { title: { type: 'string' } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const tools = extractToolsFromApi(spec, true);
+    expect(tools).toHaveLength(2);
+    expect(tools[0].outputSchema).toBeDefined();
+    expect(tools[0].outputSchema?.type).toBe('object');
+    expect(tools[1].outputSchema).toBeDefined();
+    expect((tools[1].outputSchema as any)?.anyOf || tools[1].outputSchema?.type).toBeDefined();
+  });
+
+  it('omits outputSchema when mapOutputSchema is false in buildMcpToolsFromSpec', async () => {
+    const spec = {
+      openapi: '3.0.0',
+      info: { title: 'disable-output', version: '1' },
+      paths: {
+        '/authors/{id}': {
+          get: {
+            responses: {
+              200: {
+                description: 'author',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      properties: { name: { type: 'string' } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const toolsEnabled = await buildMcpToolsFromSpec({
+      spec: spec as any,
+      baseUrl: 'http://localhost',
+      tools: { defaultInclude: true, mapOutputSchema: true },
+    });
+    expect(toolsEnabled[0].outputSchema).toBeDefined();
+
+    const toolsDisabled = await buildMcpToolsFromSpec({
+      spec: spec as any,
+      baseUrl: 'http://localhost',
+      tools: { defaultInclude: true, mapOutputSchema: false },
+    });
+    expect(toolsDisabled[0].outputSchema).toBeUndefined();
+  });
+
   it('merges path-level parameters and lets operation-level override same name+in', () => {
     const spec: OpenAPIV3.Document = {
       openapi: '3.0.0',
@@ -410,5 +596,145 @@ describe('fetch executor', () => {
       'http://localhost:3000/books/12',
       expect.objectContaining({ method: 'PUT' }),
     );
+  });
+});
+
+describe('OpenAPIMcpService tool registration with outputSchema', () => {
+  it('registers tool with outputSchema and returns structuredContent on tools/call', async () => {
+    const { OpenAPIMcpService } = await import('../src/services/openapi-mcp.service');
+    const mockSpec = {
+      openapi: '3.0.0',
+      info: { title: 'test', version: '1.0.0' },
+      paths: {
+        '/authors/{id}': {
+          get: {
+            operationId: 'getAuthor',
+            'x-mcp': true,
+            responses: {
+              200: {
+                description: 'ok',
+                content: {
+                  '*/*': {
+                    schema: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        name: { type: 'string' },
+                      },
+                      required: ['id', 'name'],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const mockExecutor = {
+      execute: jest.fn(async () => ({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        text: JSON.stringify({ id: '123', name: 'Tolkien' }),
+        json: { id: '123', name: 'Tolkien' },
+        headers: {},
+      })),
+    };
+
+    const mockRuntime = {
+      spec: mockSpec,
+    } as any;
+
+    const service = new OpenAPIMcpService(
+      {
+        specSource: { type: 'object', spec: mockSpec as any },
+        tools: { defaultInclude: true },
+        executor: { baseUrl: 'http://localhost' },
+      },
+      mockRuntime,
+      mockExecutor as any,
+    );
+
+    const server = await service.createServer();
+    const listHandler = (server as any).server._requestHandlers.get('tools/list');
+    const listResult = await listHandler({ method: 'tools/list', params: {} });
+
+    expect(listResult.tools).toHaveLength(1);
+    expect(listResult.tools[0].outputSchema).toBeDefined();
+    expect(listResult.tools[0].outputSchema.properties).toHaveProperty('id');
+    expect(listResult.tools[0].outputSchema.properties).toHaveProperty('name');
+
+    const callHandler = (server as any).server._requestHandlers.get('tools/call');
+    const callResult = await callHandler({
+      method: 'tools/call',
+      params: { name: 'getAuthor', arguments: {} },
+    });
+
+    expect(callResult.isError).toBeFalsy();
+    expect(callResult.structuredContent).toEqual({ id: '123', name: 'Tolkien' });
+    expect(callResult.content[0].text).toContain('Tolkien');
+  });
+
+  it('omits structuredContent when response payload is an array', async () => {
+    const { OpenAPIMcpService } = await import('../src/services/openapi-mcp.service');
+    const mockSpec = {
+      openapi: '3.0.0',
+      info: { title: 'test', version: '1.0.0' },
+      paths: {
+        '/authors': {
+          get: {
+            operationId: 'listAuthors',
+            'x-mcp': true,
+            responses: {
+              200: {
+                description: 'ok',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      properties: { count: { type: 'number' } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const mockExecutor = {
+      execute: jest.fn(async () => ({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        text: JSON.stringify([{ id: '1' }]),
+        json: [{ id: '1' }],
+        headers: {},
+      })),
+    };
+
+    const service = new OpenAPIMcpService(
+      {
+        specSource: { type: 'object', spec: mockSpec as any },
+        tools: { defaultInclude: true },
+        executor: { baseUrl: 'http://localhost' },
+      },
+      { spec: mockSpec } as any,
+      mockExecutor as any,
+    );
+
+    const server = await service.createServer();
+    const callHandler = (server as any).server._requestHandlers.get('tools/call');
+    const callResult = await callHandler({
+      method: 'tools/call',
+      params: { name: 'listAuthors', arguments: {} },
+    });
+
+    expect(callResult.structuredContent).toBeUndefined();
+    expect(callResult.isError).toBe(true);
+    expect(callResult.content[0].text).toContain('Output validation error');
   });
 });

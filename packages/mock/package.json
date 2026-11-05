@@ -1,12 +1,13 @@
 {
   "name": "@nest-openapi/mock",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Spec-driven mock server utilities for NestJS",
   "type": "module",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
@@ -14,28 +15,26 @@
   "files": [
     "dist/**/*",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --target node20 --outDir dist --clean --external rxjs --external @nestjs/common --external @nestjs/core",
-    "prepack": "node -e \"const fs=require('fs');const path=require('path');fs.copyFileSync(path.resolve(__dirname,'..','..','README.md'), path.resolve(__dirname,'README.md'));\"",
-    "postpack": "node -e \"const fs=require('fs');const path=require('path');try{fs.unlinkSync(path.resolve(__dirname,'README.md'))}catch(_){}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest --verbose --detectOpenHandles --forceExit"
   },
   "peerDependencies": {
-    "@nestjs/common": "^9.0.0 || ^10.0.0 || ^11.0.0",
-    "@nestjs/core": "^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@nestjs/common": "^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0",
+    "@nestjs/core": "^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0",
     "reflect-metadata": "^0.2.2"
   },
   "dependencies": {
-    "@nest-openapi/runtime": "^0.1.1",
+    "@nest-openapi/runtime": "workspace:^",
     "rxjs": "^7.2.0",
     "json-schema-faker": "^0.5.9"
   },
   "devDependencies": {
-    "@nest-openapi/runtime": "workspace:^",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/testing": "^11.0.0",

@@ -8,7 +8,7 @@ import type { McpToolDefinition } from '../types';
 export async function buildMcpToolsFromSpec(args: {
   spec: OpenAPISpec;
   baseUrl: string;
-  tools: { defaultInclude: boolean; namePrefix?: string };
+  tools: { defaultInclude: boolean; namePrefix?: string; mapOutputSchema?: boolean };
 }): Promise<Array<McpToolDefinition>> {
   const generated = extractToolsFromApi(args.spec as OpenAPIV3.Document, args.tools.defaultInclude);
 
@@ -29,7 +29,7 @@ export async function buildMcpToolsFromSpec(args: {
       method: tool.method.toLowerCase(),
       pathTemplate: tool.pathTemplate,
       inputSchema: tool.inputSchema ?? { type: 'object', properties: {} },
-      outputSchema: tool.outputSchema,
+      outputSchema: args.tools.mapOutputSchema === false ? undefined : tool.outputSchema,
       executionParameters: tool.executionParameters,
       requestBodyContentType: tool.requestBodyContentType,
       securityRequirements: tool.securityRequirements,

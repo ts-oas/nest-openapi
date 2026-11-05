@@ -1,6 +1,6 @@
 {
   "name": "@nest-openapi/mcp",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Spec-driven MCP server for exposing OpenAPI operations as tools",
   "sideEffects": false,
   "keywords": [
@@ -29,6 +29,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
@@ -36,28 +37,26 @@
   "files": [
     "dist/**/*",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --target node20 --outDir dist --clean --external zod --external @modelcontextprotocol/sdk --external @nestjs/common --external @nestjs/core",
     "test": "jest",
-    "prepack": "node -e \"const fs=require('fs');const path=require('path');fs.copyFileSync(path.resolve(__dirname,'..','..','README.md'), path.resolve(__dirname,'README.md'));\"",
-    "postpack": "node -e \"const fs=require('fs');const path=require('path');try{fs.unlinkSync(path.resolve(__dirname,'README.md'))}catch(_){}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "peerDependencies": {
-    "@nestjs/common": "^9.0.0 || ^10.0.0 || ^11.0.0",
-    "@nestjs/core": "^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@nestjs/common": "^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0",
+    "@nestjs/core": "^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0",
     "reflect-metadata": "^0.2.2"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "@nest-openapi/runtime": "^0.1.2",
+    "@nest-openapi/runtime": "workspace:^",
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@nest-openapi/runtime": "workspace:^",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.1.3",

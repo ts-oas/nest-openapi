@@ -104,3 +104,16 @@ OpenAPI operations are included based on this precedence:
 4. `tools.defaultInclude`
 
 This lets you define strict opt-in or broad include policies, then override at narrower scopes.
+
+## Tool responses and output schemas
+
+Successful tool calls return text `content` (preserving original payloads) and optional JSON `structuredContent`.
+
+When all declared 2xx responses have JSON schemas, `outputSchema` is generated:
+
+- **Single object response**: Returned directly in `structuredContent` (unwrapped).
+- **Non-object responses** (arrays, primitives, nullables, unions): Wrapped as `{ result: payload }` to satisfy MCP's object schema requirement.
+- **Multiple 2xx responses**: If an operation declares multiple distinct 2xx success schemas (e.g. `200` and `201`), they are combined with `anyOf` and wrapped as `{ result: payload }`. Identical schemas are deduplicated into a single unwrapped schema.
+- **Empty body (`204`) / non-JSON**: If any success response lacks a JSON body, `outputSchema` is omitted so valid responses are not rejected by an incomplete contract.
+
+To disable structured output mapping, set [`tools.mapOutputSchema`](options.md#tools) to `false`.
