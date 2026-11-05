@@ -1,0 +1,91 @@
+/* Hide the download button */
+.markdown-copy-buttons .download-btn {
+	display: none !important;
+}
+
+/* Stick to the right end of the doc, in front of the title (left to the minimap) */
+.vp-doc {
+	position: relative;
+}
+
+.vp-doc > h1:first-of-type {
+	padding-right: 130px;
+}
+
+.markdown-copy-buttons {
+	position: absolute !important;
+	top: 4px !important;
+	right: 0 !important;
+	margin: 0 !important;
+	width: auto !important;
+	z-index: 10;
+}
+
+.markdown-copy-buttons-inner {
+	margin: 0 !important;
+}
+
+.markdown-copy-buttons .dropdown-trigger {
+	font-size: 12px !important;
+	border-radius: 6px !important;
+}
+
+.markdown-copy-buttons .copy-page {
+	padding: 4px 10px !important;
+	font-size: 12px !important;
+}
+
+.markdown-copy-buttons .chevron-wrapper {
+	padding: 0 8px !important;
+}
+
+.markdown-copy-buttons .divider {
+	height: 18px !important;
+}
+
+.markdown-copy-buttons .icon {
+	width: 14px !important;
+	height: 14px !important;
+}
+
+/* Dropdown menu: align to right and ensure single line items */
+.markdown-copy-buttons .dropdown-menu {
+	right: 0 !important;
+	left: auto !important;
+	min-width: 210px !important;
+	width: max-content !important;
+	font-size: 12px !important;
+	border-radius: 8px !important;
+}
+
+.markdown-copy-buttons .dropdown-item {
+	padding: 8px 12px !important;
+	font-size: 12px !important;
+	white-space: nowrap !important;
+}
+
+/* Badges: strictly inline on the same row with consistent gap */
+.badges,
+.vp-doc .badges {
+	display: flex !important;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin: 12px 0 16px 0;
+}
+
+.badges a,
+.vp-doc .badges a {
+	display: inline-flex !important;
+	align-items: center;
+	line-height: 1;
+	border-bottom: none !important;
+	text-decoration: none !important;
+}
+
+.badges img,
+.vp-doc .badges img {
+	display: block !important;
+	margin: 0 !important;
+	height: 20px;
+}

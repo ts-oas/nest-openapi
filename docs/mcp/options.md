@@ -31,8 +31,9 @@
 
 | Option           | Type      | Default | Description                                                         |
 | ---------------- | --------- | ------- | ------------------------------------------------------------------- |
-| `defaultInclude` | `boolean` | `false` | Include operations as tools by default when `x-mcp` is not defined. |
-| `namePrefix`     | `string`  | —       | Optional prefix for generated tool names (e.g. `api_`).             |
+| `defaultInclude`  | `boolean` | `false` | Include operations as tools by default when `x-mcp` is not defined.                                                                     |
+| `namePrefix`      | `string`  | —       | Optional prefix for generated tool names (e.g. `api_`).                                                                                 |
+| `mapOutputSchema` | `boolean` | `true`  | Map 2xx success response schemas (from `application/json`, `*/*`, etc.) to MCP tool `outputSchema`. Only object schemas are mapped. |
 
 `x-mcp` precedence for operation inclusion is:
 
